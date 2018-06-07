@@ -16,7 +16,8 @@ const Title = ({ title }) => {
 	);
 }
 
-const InputBox = ({ onClickButton }) => {
+const InputBox = ({ onClickButton, onChangeText, inputTxt }) => {
+	console.log(onChangeText);
 	return (
 		<div style={{
 			height: "100px", width: "100%",
@@ -32,7 +33,7 @@ const InputBox = ({ onClickButton }) => {
 				justifyContent: "center",
 				alignItems: "center"
 			}}>
-				<input style={{padding:"10px"}} />
+				<input onChange={(event) => onChangeText(event)} style={{padding:"10px"}} value={inputTxt} />
 			</div>
 
 			<div style={{
@@ -42,7 +43,7 @@ const InputBox = ({ onClickButton }) => {
 				justifyContent: "center",
 				alignItems: "center"
 			}}>
-				<button onClick={(event) => onClickButton(event)} >Add Item</button>
+				<button onClick={() => onClickButton()}>Add Item</button>
 			</div>
 		</div>
 	);
@@ -73,12 +74,12 @@ const rowItems = [{
 },
 {
 	id: 2,
-	text: "Sample row",
+	text: "Sample row2",
 	isChecked: false
 },
 {
 	id: 3,
-	text: "Sample row",
+	text: "Sample row3",
 	isChecked: false
 }];
 
@@ -86,23 +87,38 @@ class ToDo extends Component {
 	constructor() {
 		super();
 		this.state = {
-			todoItems: rowItems
+			todoItems: [],
+			inputTxt: ""
 		};
+		this.inputBoxRef = {};
 	}
 
-	handleInputBoxButton = (event) => {
-		this.setState({ rowText: event.target.value });
+	handleAddButton = () => {
+		const { todoItems, inputTxt } = this.state;
+		const text = inputTxt;
+		const previousArrLen = todoItems && Array.isArray(todoItems) && todoItems.length || 0;
+		const id = previousArrLen + 1;
+		todoItems.push({
+			id,
+			text,
+			isChecked: false
+		});
+		this.setState({ todoItems, inputTxt: "" });
 	} 
 
 	onDeleteItem = (id) => {
 		console.log(id);
 	}
 
+	onChangeText = (event) => {
+		this.setState({ inputTxt: event.target.value});
+	} 
+
 	render() {
 		return (
 			<div style={{ height: "1000px", width: "100%", backgroundColor: "lightgray" }}>
 				<Title title="To Do List" />
-				<InputBox onClickButton={this.handleInputBoxButton}/>
+				<InputBox onClickButton={this.handleAddButton} onChangeText={this.onChangeText} inputTxt={this.state.inputTxt}/>
 				<ToDoItemsContainer items={this.state.todoItems} onDeleteItem={this.onDeleteItem}/>
 			</div>
 		);
